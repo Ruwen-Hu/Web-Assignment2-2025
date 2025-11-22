@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Home - Pilates Studio";
+}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Begin Your Pilates Journey</h1>
+        <p class="hero-subtitle">Professional instructor guidance, personalized courses, improving physical and mental health</p>
+        <a href="@Url.Action("Schedule", "Course")" class="cta-button">View Courses</a>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2>Why Choose Us</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-user-md"></i>
+                <h3>Professional Instructors</h3>
+                <p>Internationally certified professional Pilates instructor team</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-heart"></i>
+                <h3>Personalized Courses</h3>
+                <p>Customized training plans based on your needs</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-home"></i>
+                <h3>Comfortable Environment</h3>
+                <p>Professional equipment, warm and comfortable training space</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="instructors">
+    <div class="container">
+        <h2>Our Instructor Team</h2>
+        <div class="instructors-grid">
+            @foreach (var instructor in ViewBag.Instructors)
+            {
+                <div class="instructor-card">
+                    <img src="@instructor.ImageUrl" alt="@instructor.Name">
+                    <h3>@instructor.Name</h3>
+                    <p class="specialization">@instructor.Specialization</p>
+                    <p class="experience">@instructor.ExperienceYears years experience</p>
+                    <p class="certification">@instructor.Certification</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="testimonials">
+    <div class="container">
+        <h2>Student Feedback</h2>
+        <div class="testimonials-grid">
+            @foreach (var testimonial in ViewBag.Testimonials)
+            {
+                <div class="testimonial-card">
+                    <div class="rating">
+                        @for (int i = 0; i < testimonial.Rating; i++)
+                        {
+                            <i class="fas fa-star"></i>
+                        }
+                    </div>
+                    <p class="testimonial-content">"@testimonial.Content"</p>
+                    <p class="client-name">- @testimonial.ClientName</p>
+                    <p class="testimonial-date">@testimonial.Date</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>

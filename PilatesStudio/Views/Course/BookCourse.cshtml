@@ -1,0 +1,257 @@
+﻿@model PilatesStudio.Models.Booking
+@{
+    ViewBag.Title = "Course Booking - Pilates Studio";
+}
+
+<section class="booking-hero">
+    <div class="container">
+        <h1>Course Booking</h1>
+        <p>Please fill in your booking information</p>
+    </div>
+</section>
+
+<section class="booking-content">
+    <div class="container">
+        <div class="booking-grid">
+            <!-- Course Information -->
+            <div class="course-summary">
+                <h2>@Model.Course.Title</h2>
+                <div class="course-details">
+                    <p><strong>Instructor:</strong> @Model.Course.Instructor</p>
+                    <p><strong>Time:</strong> @Model.Course.Schedule.ToString("yyyy/MM/dd HH:mm")</p>
+                    <p><strong>Duration:</strong> @Model.Course.Duration</p>
+                    <p><strong>Level:</strong> @Model.Course.Level</p>
+                    <p><strong>Price:</strong> ¥@Model.Course.Price</p>
+                    <p><strong>Available Spots:</strong> @Model.Course.AvailableSpots</p>
+                </div>
+                <div class="course-description">
+                    <h3>Course Description</h3>
+                    <p>@Model.Course.Description</p>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="booking-form-container">
+                <div class="booking-form">
+                    <h2>Booking Information</h2>
+
+                    @using (Html.BeginForm("BookCourse", "Course", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.CourseId)
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.CustomerName, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Please enter your name",
+                                required = "required"
+                            })
+                            @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerEmail, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.CustomerEmail, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Please enter your email",
+                                type = "email",
+                                required = "required"
+                            })
+                            @Html.ValidationMessageFor(m => m.CustomerEmail, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerPhone, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.CustomerPhone, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Please enter your phone number",
+                                required = "required"
+                            })
+                            @Html.ValidationMessageFor(m => m.CustomerPhone, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Notes, new { @class = "form-label" })
+                            @Html.TextAreaFor(m => m.Notes, new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                placeholder = "If you have any special requirements or notes, please write here..."
+                            })
+                            @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="submit-button">Confirm Booking</button>
+                            <a href="@Url.Action("Schedule")" class="cancel-button">Cancel</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .booking-hero {
+        background: linear-gradient(135deg, #D4C0A1 0%, #C8A87F 100%);
+        padding: 100px 0 60px;
+        text-align: center;
+        color: white;
+        margin-top: 70px;
+    }
+
+        .booking-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+    .booking-content {
+        padding: 3rem 0;
+    }
+
+    .booking-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .course-summary {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+        .course-summary h2 {
+            color: #8B7355;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #D4C0A1;
+            padding-bottom: 0.5rem;
+        }
+
+    .course-details {
+        margin-bottom: 2rem;
+    }
+
+        .course-details p {
+            margin-bottom: 0.8rem;
+            color: #555;
+        }
+
+        .course-details strong {
+            color: #8B7355;
+            width: 100px;
+            display: inline-block;
+        }
+
+    .course-description h3 {
+        color: #8B7355;
+        margin-bottom: 1rem;
+    }
+
+    .booking-form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .booking-form h2 {
+        color: #8B7355;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #D4C0A1;
+        padding-bottom: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e8e8e8;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #C8A87F;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .submit-button {
+        background: #8B7355;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        flex: 1;
+    }
+
+        .submit-button:hover {
+            background: #C8A87F;
+        }
+
+    .cancel-button {
+        background: #6c757d;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        text-decoration: none;
+        text-align: center;
+        transition: background 0.3s ease;
+        flex: 1;
+    }
+
+        .cancel-button:hover {
+            background: #545b62;
+            color: white;
+            text-decoration: none;
+        }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+        .booking-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+@section scripts {
+    <script src="~/Scripts/BookingForm.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+}

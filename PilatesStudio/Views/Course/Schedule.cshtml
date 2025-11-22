@@ -1,0 +1,95 @@
+﻿@model List<PilatesStudio.Models.Course>
+@{
+    ViewBag.Title = "Schedule - Pilates Studio";
+}
+
+<section class="schedule-hero">
+    <div class="container">
+        <h1>Course Schedule</h1>
+        <p>View our course timetable and choose the right class for you</p>
+    </div>
+</section>
+
+<section class="schedule-content">
+    <div class="container">
+        <!-- Success Message -->
+        @if (TempData["BookingSuccess"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["BookingSuccess"]
+            </div>
+        }
+
+        <div class="schedule-grid">
+            @foreach (var course in Model)
+            {
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="@course.ImageUrl" alt="@course.Title">
+                    </div>
+                    <div class="course-info">
+                        <h3>@course.Title</h3>
+                        <p class="course-description">@course.Description</p>
+                        <div class="course-details">
+                            <p><i class="fas fa-user"></i> Instructor: @course.Instructor</p>
+                            <p><i class="fas fa-clock"></i> Time: @course.Schedule.ToString("MM/dd HH:mm")</p>
+                            <p><i class="fas fa-stopwatch"></i> Duration: @course.Duration</p>
+                            <p><i class="fas fa-signal"></i> Level: @course.Level</p>
+                            <p><i class="fas fa-tag"></i> Price: ¥@course.Price</p>
+                            <p><i class="fas fa-users"></i> Available Spots: @course.AvailableSpots</p>
+                        </div>
+                        @if (course.AvailableSpots > 0)
+                        {
+                            <a href="@Url.Action("BookCourse", new { id = course.Id })" class="book-button">Book Now</a>
+                        }
+                        else
+                        {
+                            <button class="book-button disabled" disabled>Fully Booked</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Schedule page specific styles */
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 2rem;
+        padding: 1rem 0;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .schedule-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            height: auto; /* Adaptive height for mobile */
+            min-height: 450px;
+        }
+
+        .course-image {
+            height: 200px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .schedule-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .course-card {
+            margin: 0 10px;
+        }
+    }
+</style>
+
+@section scripts {
+    <script src="~/Scripts/ScrollAnimation.js"></script>
+}

@@ -1,0 +1,138 @@
+﻿@model List<PilatesStudio.Models.Course>
+@{
+    ViewBag.Title = "Course Search - Pilates Studio";
+}
+
+@section styles {
+    <link href="~/Content/FilterSearch.css" rel="stylesheet" />
+}
+
+<section class="filter-hero">
+    <div class="container">
+        <h1>Course Search & Filter</h1>
+        <p>Real-time search, filtering and sorting to find the perfect course for you</p>
+    </div>
+</section>
+
+<section class="filter-content">
+    <div class="container">
+        <!-- Search Filter Form -->
+        <div class="filter-form">
+            <div class="form-grid">
+                <div class="form-group search-group">
+                    <label for="searchInput">Search Courses</label>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" name="searchInput"
+                               placeholder="Enter course name, description or instructor..."
+                               class="search-input"
+                               value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="levelFilter">Level</label>
+                    <select id="levelFilter" name="levelFilter" class="filter-select">
+                        <option value="all">All Levels</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter" name="categoryFilter" class="filter-select">
+                        <option value="all">All Categories</option>
+                        <option value="Basic">Basic</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Rehabilitation">Rehabilitation</option>
+                        <option value="Prenatal">Prenatal</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sortFilter">Sort By</label>
+                    <select id="sortFilter" name="sortFilter" class="filter-select">
+                        <option value="schedule">By Time</option>
+                        <option value="price">By Price</option>
+                        <option value="title">By Name</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Searching courses...</p>
+        </div>
+
+        <!-- Course Results -->
+        <div class="courses-results">
+            <h2>Found <span id="courseCount">@Model.Count</span> courses</h2>
+            <div id="coursesContainer" class="courses-grid">
+                @if (Model.Any())
+                {
+                    foreach (var course in Model)
+                    {
+                        <div class="course-card" data-course-id="@course.Id">
+                            <div class="course-image">
+                                <img src="@course.ImageUrl" alt="@course.Title"
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvuWDj+WbvueBhzwvdGV4dD48L3N2Zz4='">
+                            </div>
+                            <div class="course-info">
+                                <h3>@course.Title</h3>
+                                <p class="course-category">@course.Category - @course.Level</p>
+                                <p class="course-description">@course.Description</p>
+                                <div class="course-details">
+                                    <p><i class="fas fa-user"></i> @course.Instructor</p>
+                                    <p><i class="fas fa-clock"></i> @course.Schedule.ToString("MM/dd HH:mm")</p>
+                                    <p><i class="fas fa-tag"></i> ¥@course.Price</p>
+                                    <p><i class="fas fa-users"></i> @course.AvailableSpots spots remaining</p>
+                                </div>
+                                @if (course.AvailableSpots > 0)
+                                {
+                                    <a href="@Url.Action("BookCourse", new { id = course.Id })" class="book-button">Book Now</a>
+                                }
+                                else
+                                {
+                                    <button class="book-button disabled" disabled>Fully Booked</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-results">
+                        <i class="fas fa-search fa-3x"></i>
+                        <h3>No Courses Found</h3>
+                        <p>Currently no available courses</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <!-- Ensure jQuery validation libraries are correctly loaded -->
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/FilterSearch.js"></script>
+
+    <!-- Debug script -->
+    <script>
+        $(document).ready(function () {
+            console.log('✅ jQuery version:', $.fn.jquery);
+            console.log('✅ Search input:', $('#searchInput').length);
+            console.log('✅ Courses container:', $('#coursesContainer').length);
+
+            // Test search functionality
+            $('#searchInput').on('input', function () {
+                console.log('Search input:', $(this).val());
+            });
+        });
+    </script>
+}
