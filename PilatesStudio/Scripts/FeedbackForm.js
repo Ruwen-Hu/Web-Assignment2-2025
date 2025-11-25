@@ -1,96 +1,93 @@
-﻿// Contact form validation and interaction
-$(document).ready(function () {
-    // Form submission handling
-    $('form').on('submit', function (e) {
-        const name = $('#Name').val().trim();
-        const email = $('#Email').val().trim();
-        const message = $('#Message').val().trim();
+﻿// FeedbackForm.js - Native JavaScript version
+(function () {
+    'use strict';
 
-        let isValid = true;
+    document.addEventListener('DOMContentLoaded', function () {
+        const contactForm = document.querySelector('.contact-form form');
+        const formControls = document.querySelectorAll('.form-control');
 
-        // Clear previous error messages
-        $('.error-message').remove();
-        $('.form-control').removeClass('error');
+        if (!contactForm) return;
 
-        // Name validation
-        if (name === '') {
-            showError('Name', 'Please enter your name');
-            isValid = false;
-        }
+        contactForm.addEventListener('submit', function (e) {
+            const name = document.getElementById('Name')?.value.trim();
+            const email = document.getElementById('Email')?.value.trim();
+            const message = document.getElementById('Message')?.value.trim();
 
-        // Email validation
-        if (email === '') {
-            showError('Email', 'Please enter your email');
-            isValid = false;
-        } else if (!isValidEmail(email)) {
-            showError('Email', 'Please enter a valid email address');
-            isValid = false;
-        }
+            let isValid = true;
 
-        // Message validation
-        if (message === '') {
-            showError('Message', 'Please enter your message');
-            isValid = false;
-        }
+            // Clear previous error messages
+            document.querySelectorAll('.error-message').forEach(function (el) {
+                el.remove();
+            });
+            formControls.forEach(function (field) {
+                field.classList.remove('error');
+            });
 
-        if (!isValid) {
-            e.preventDefault();
-        }
-    });
-
-    // Show error message
-    function showError(fieldName, message) {
-        const $field = $('#' + fieldName);
-        $field.addClass('error');
-        $field.after('<span class="error-message" style="color: red; font-size: 0.9rem; display: block; margin-top: 0.25rem;">' + message + '</span>');
-    }
-
-    // Email format validation
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    // Real-time validation
-    $('.form-control').on('blur', function () {
-        const $field = $(this);
-        const value = $field.val().trim();
-        const fieldName = $field.attr('id');
-
-        $('.error-message').remove();
-        $field.removeClass('error');
-
-        if (value === '') {
-            if (fieldName !== 'Phone') { // Phone is optional
-                showError(fieldName, 'This field is required');
+            // Name validation
+            if (!name) {
+                showError('Name', 'Please enter your name');
+                isValid = false;
             }
-        } else if (fieldName === 'Email' && !isValidEmail(value)) {
-            showError(fieldName, 'Please enter a valid email address');
+
+            // Email validation
+            if (!email) {
+                showError('Email', 'Please enter your email');
+                isValid = false;
+            } else if (!isValidEmail(email)) {
+                showError('Email', 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            // Message validation
+            if (!message) {
+                showError('Message', 'Please enter your message');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        // Real-time validation
+        formControls.forEach(function (field) {
+            field.addEventListener('blur', function () {
+                const value = this.value.trim();
+                const fieldName = this.getAttribute('id');
+
+                // Remove existing error messages for this field
+                const existingError = this.nextElementSibling;
+                if (existingError && existingError.classList.contains('error-message')) {
+                    existingError.remove();
+                }
+                this.classList.remove('error');
+
+                if (!value) {
+                    if (fieldName !== 'Phone') {
+                        showError(fieldName, 'This field is required');
+                    }
+                } else if (fieldName === 'Email' && !isValidEmail(value)) {
+                    showError(fieldName, 'Please enter a valid email address');
+                }
+            });
+        });
+
+        function showError(fieldName, message) {
+            const field = document.getElementById(fieldName);
+            if (!field) return;
+
+            field.classList.add('error');
+            const errorSpan = document.createElement('span');
+            errorSpan.className = 'error-message';
+            errorSpan.style.cssText = 'color: #dc3545; font-size: 0.9rem; display: block; margin-top: 0.25rem;';
+            errorSpan.textContent = message;
+            field.parentNode.insertBefore(errorSpan, field.nextSibling);
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
         }
     });
-});
 
-// Add error styles to CSS
-const errorStyle = document.createElement('style');
-errorStyle.textContent = `
-    .form-control.error {
-        border-color: #dc3545;
-    }
-    
-    .error-message {
-        color: #dc3545;
-        font-size: 0.9rem;
-        display: block;
-        margin-top: 0.25rem;
-    }
-    
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-bottom: 1rem;
-        border: 1px solid #c3e6cb;
-    }
-`;
-document.head.appendChild(errorStyle);
+})();

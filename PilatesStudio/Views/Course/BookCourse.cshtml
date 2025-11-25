@@ -35,53 +35,61 @@
                 <div class="booking-form">
                     <h2>Booking Information</h2>
 
-                    @using (Html.BeginForm("BookCourse", "Course", FormMethod.Post))
+                    @using (Html.BeginForm("BookCourse", "Course", FormMethod.Post, new { id = "bookingForm" }))
                     {
                         @Html.AntiForgeryToken()
                         @Html.HiddenFor(m => m.CourseId)
 
                         <div class="form-group">
-                            @Html.LabelFor(m => m.CustomerName, new { @class = "form-label" })
+                            <label for="CustomerName" class="form-label">Name</label>
                             @Html.TextBoxFor(m => m.CustomerName, new
                             {
                                 @class = "form-control",
                                 placeholder = "Please enter your name",
-                                required = "required"
+                                required = "required",
+                                id = "CustomerName"
                             })
+                            <span class="validation-error" data-for="CustomerName"></span>
                             @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group">
-                            @Html.LabelFor(m => m.CustomerEmail, new { @class = "form-label" })
+                            <label for="CustomerEmail" class="form-label">Email</label>
                             @Html.TextBoxFor(m => m.CustomerEmail, new
                             {
                                 @class = "form-control",
                                 placeholder = "Please enter your email",
                                 type = "email",
-                                required = "required"
+                                required = "required",
+                                id = "CustomerEmail"
                             })
+                            <span class="validation-error" data-for="CustomerEmail"></span>
                             @Html.ValidationMessageFor(m => m.CustomerEmail, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group">
-                            @Html.LabelFor(m => m.CustomerPhone, new { @class = "form-label" })
+                            <label for="CustomerPhone" class="form-label">Phone</label>
                             @Html.TextBoxFor(m => m.CustomerPhone, new
                             {
                                 @class = "form-control",
                                 placeholder = "Please enter your phone number",
-                                required = "required"
+                                required = "required",
+                                id = "CustomerPhone"
                             })
+                            <span class="validation-error" data-for="CustomerPhone"></span>
                             @Html.ValidationMessageFor(m => m.CustomerPhone, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group">
-                            @Html.LabelFor(m => m.Notes, new { @class = "form-label" })
+                            <label for="Notes" class="form-label">Notes (Optional)</label>
                             @Html.TextAreaFor(m => m.Notes, new
                             {
                                 @class = "form-control",
                                 rows = "4",
-                                placeholder = "If you have any special requirements or notes, please write here..."
+                                placeholder = "If you have any special requirements or notes, please write here...",
+                                id = "Notes"
                             })
+                            <span class="validation-error" data-for="Notes"></span>
                             @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
                         </div>
 
@@ -194,6 +202,10 @@
             border-color: #C8A87F;
         }
 
+        .form-control.error {
+            border-color: #dc3545;
+        }
+
     .form-actions {
         display: flex;
         gap: 1rem;
@@ -240,6 +252,13 @@
         display: block;
     }
 
+    .validation-error {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
     @@media (max-width: 768px) {
         .booking-grid {
             grid-template-columns: 1fr;
@@ -253,5 +272,19 @@
 
 @section scripts {
     <script src="~/Scripts/BookingForm.js"></script>
-    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ Booking page loaded (Native JS)');
+
+          
+            const bookingSections = document.querySelectorAll('.course-summary, .booking-form-container');
+            bookingSections.forEach(section => {
+                section.classList.add('fade-in');
+            });
+            setTimeout(function () {
+                window.dispatchEvent(new Event('scroll'));
+            }, 100);
+        });
+    </script>
 }

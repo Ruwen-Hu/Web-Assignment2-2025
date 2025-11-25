@@ -1,133 +1,164 @@
-﻿// FilterSearch.js - Fixed version
-(function ($) {
+﻿// FilterSearch.js - Native JavaScript version
+(function () {
     'use strict';
 
-    $(document).ready(function () {
-        console.log('=== Starting search functionality initialization ===');
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const levelFilter = document.getElementById('levelFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const coursesContainer = document.getElementById('coursesContainer');
+        const courseCount = document.getElementById('courseCount');
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
-        // Check necessary elements
-        const $searchInput = $('#searchInput');
-        const $levelFilter = $('#levelFilter');
-        const $categoryFilter = $('#categoryFilter');
-        const $sortFilter = $('#sortFilter');
-        const $coursesContainer = $('#coursesContainer');
+        console.log('✅ FilterSearch.js loaded (Native)');
 
-        if ($searchInput.length === 0) {
-            console.error('❌ Search input not found');
-            return;
+        // Add event listeners
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(handleFilterChange, 300));
         }
-        if ($coursesContainer.length === 0) {
-            console.error('❌ Courses container not found');
-            return;
+        if (levelFilter) {
+            levelFilter.addEventListener('change', handleFilterChange);
+        }
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', handleFilterChange);
+        }
+        if (sortFilter) {
+            sortFilter.addEventListener('change', handleFilterChange);
         }
 
-        console.log('✅ All necessary elements exist');
+        function handleFilterChange() {
+            const searchTerm = searchInput ? searchInput.value : '';
+            const level = levelFilter ? levelFilter.value : 'all';
+            const category = categoryFilter ? categoryFilter.value : 'all';
+            const sortBy = sortFilter ? sortFilter.value : 'schedule';
 
-        let searchTimeout = null;
+            console.log('Filter changed:', { searchTerm, level, category, sortBy });
 
-        // Bind events
-        $levelFilter.on('change', function () {
-            console.log('Level filter changed:', this.value);
-            performSearch();
-        });
+            filterCourses(searchTerm, level, category, sortBy);
+        }
 
-        $categoryFilter.on('change', function () {
-            console.log('Category filter changed:', this.value);
-            performSearch();
-        });
+        function filterCourses(searchTerm, level, category, sortBy) {
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'block';
+            }
 
-        $sortFilter.on('change', function () {
-            console.log('Sort changed:', this.value);
-            performSearch();
-        });
+            // Simulate API call - in real application this would be a fetch request
+            setTimeout(() => {
+                try {
+                    const formData = new FormData();
+                    formData.append('searchTerm', searchTerm);
+                    formData.append('level', level);
+                    formData.append('category', category);
+                    formData.append('sortBy', sortBy);
 
-        $searchInput.on('input', function () {
-            const searchTerm = $(this).val().trim();
-            console.log('Search input:', searchTerm);
+                    // This would be your actual API endpoint
+                    fetch('/Course/FilterCourses', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'RequestVerificationToken': getAntiForgeryToken()
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateCoursesDisplay(data.courses);
+                                if (courseCount) {
+                                    courseCount.textContent = data.count;
+                                }
+                            } else {
+                                console.error('Search failed:', data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Search error:', error);
+                            // Fallback to client-side filtering if server fails
+                            fallbackFilter(searchTerm, level, category, sortBy);
+                        })
+                        .finally(() => {
+                            if (loadingIndicator) {
+                                loadingIndicator.style.display = 'none';
+                            }
+                        });
 
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function () {
-                performSearch();
-            }, 500);
-        });
-
-        // Search function
-        function performSearch() {
-            const searchData = {
-                searchTerm: $searchInput.val().trim(),
-                level: $levelFilter.val(),
-                category: $categoryFilter.val(),
-                sortBy: $sortFilter.val()
-            };
-
-            console.log('Sending search request:', searchData);
-
-            // Show loading state
-            $('#loadingIndicator').show();
-            $coursesContainer.css('opacity', '0.6');
-
-            $.ajax({
-                url: '/Course/FilterCourses',
-                type: 'POST',
-                data: JSON.stringify(searchData),
-                contentType: 'application/json',
-                dataType: 'json'
-            })
-                .done(function (response) {
-                    console.log('Received response:', response);
-
-                    if (response.success) {
-                        updateCoursesDisplay(response.courses, response.count);
-                    } else {
-                        showError('Search failed: ' + response.message);
+                } catch (error) {
+                    console.error('Filter error:', error);
+                    fallbackFilter(searchTerm, level, category, sortBy);
+                    if (loadingIndicator) {
+                        loadingIndicator.style.display = 'none';
                     }
-                })
-                .fail(function (xhr, status, error) {
-                    console.error('Request failed:', status, error);
-                    console.log('Response text:', xhr.responseText);
-                    showError('Network error, please check connection: ' + error);
-                })
-                .always(function () {
-                    $('#loadingIndicator').hide();
-                    $coursesContainer.css('opacity', '1');
-                });
+                }
+            }, 500);
         }
 
-        function updateCoursesDisplay(courses, count) {
-            console.log('Updating display:', count, 'courses');
+        function fallbackFilter(searchTerm, level, category, sortBy) {
+            // Client-side filtering as fallback
+            const courseCards = document.querySelectorAll('.course-card');
+            let visibleCount = 0;
 
-            const $count = $('#courseCount');
-            $count.text(count);
+            courseCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('.course-description').textContent.toLowerCase();
+                const instructor = card.querySelector('.course-details p:first-child').textContent.toLowerCase();
+                const courseLevel = card.querySelector('.course-category').textContent.toLowerCase();
+                const courseCategory = card.querySelector('.course-category').textContent.toLowerCase();
 
-            if (!courses || courses.length === 0) {
-                $coursesContainer.html(`
-                    <div class="no-results" style="grid-column: 1 / -1;">
+                let shouldShow = true;
+
+                // Search filter
+                if (searchTerm) {
+                    const searchLower = searchTerm.toLowerCase();
+                    if (!title.includes(searchLower) &&
+                        !description.includes(searchLower) &&
+                        !instructor.includes(searchLower)) {
+                        shouldShow = false;
+                    }
+                }
+
+                // Level filter
+                if (level !== 'all' && !courseLevel.includes(level.toLowerCase())) {
+                    shouldShow = false;
+                }
+
+                // Category filter
+                if (category !== 'all' && !courseCategory.includes(category.toLowerCase())) {
+                    shouldShow = false;
+                }
+
+                if (shouldShow) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (courseCount) {
+                courseCount.textContent = visibleCount;
+            }
+        }
+
+        function updateCoursesDisplay(courses) {
+            if (!coursesContainer) return;
+
+            if (courses.length === 0) {
+                coursesContainer.innerHTML = `
+                    <div class="no-results">
                         <i class="fas fa-search fa-3x"></i>
-                        <h3>No matching courses found</h3>
-                        <p>Please try adjusting your search criteria or filter options</p>
+                        <h3>No Courses Found</h3>
+                        <p>No courses match your search criteria</p>
                     </div>
-                `);
+                `;
                 return;
             }
 
             let html = '';
-            courses.forEach(function (course) {
-                const buttonHtml = course.AvailableSpots > 0
-                    ? `<a href="/Course/BookCourse/${course.Id}" class="book-button">Book Now</a>`
-                    : `<button class="book-button disabled" disabled>Fully Booked</button>`;
-
-                // Format date
-                const schedule = new Date(course.Schedule).toLocaleString('en-US', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }).replace(/\//g, '/').replace(' ', ' ');
-
+            courses.forEach(course => {
                 html += `
-                    <div class="course-card">
+                    <div class="course-card" data-course-id="${course.Id}">
                         <div class="course-image">
-                            <img src="${course.ImageUrl}" alt="${course.Title}" 
+                            <img src="${course.ImageUrl}" alt="${course.Title}"
                                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvuWDj+WbvueBhzwvdGV4dD48L3N2Zz4='">
                         </div>
                         <div class="course-info">
@@ -136,31 +167,38 @@
                             <p class="course-description">${course.Description}</p>
                             <div class="course-details">
                                 <p><i class="fas fa-user"></i> ${course.Instructor}</p>
-                                <p><i class="fas fa-clock"></i> ${schedule}</p>
+                                <p><i class="fas fa-clock"></i> ${new Date(course.Schedule).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })} ${new Date(course.Schedule).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
                                 <p><i class="fas fa-tag"></i> ¥${course.Price}</p>
                                 <p><i class="fas fa-users"></i> ${course.AvailableSpots} spots remaining</p>
                             </div>
-                            ${buttonHtml}
+                            ${course.AvailableSpots > 0 ?
+                        `<a href="/Course/BookCourse/${course.Id}" class="book-button">Book Now</a>` :
+                        `<button class="book-button disabled" disabled>Fully Booked</button>`
+                    }
                         </div>
                     </div>
                 `;
             });
 
-            $coursesContainer.html(html);
+            coursesContainer.innerHTML = html;
         }
 
-        function showError(message) {
-            $coursesContainer.html(`
-                <div class="no-results" style="grid-column: 1 / -1;">
-                    <i class="fas fa-exclamation-triangle fa-3x"></i>
-                    <h3>${message}</h3>
-                    <button onclick="location.reload()" class="book-button" style="margin-top: 1rem; width: auto; display: inline-block;">Reload</button>
-                </div>
-            `);
+        function getAntiForgeryToken() {
+            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            return tokenElement ? tokenElement.value : '';
         }
 
-        console.log('=== Search functionality initialization completed ===');
-        console.log('💡 Tip: Try changing filters or entering search text');
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
     });
 
-})(jQuery);
+})();

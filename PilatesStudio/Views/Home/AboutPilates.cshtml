@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "About Pilates - Pilates Studio";
 }
 
@@ -26,7 +25,6 @@
 
         <!-- Benefits Card -->
         <div class="about-card">
-            
             <div class="card-image">
                 <img src="/Content/Images/about/pilates-benefits.png" alt="Pilates Benefits"
                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmFmN2YyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzhCNzM1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlBpbGF0ZXMgQmVuZWZpdHM8L3RleHQ+PC9zdmc+'">
@@ -202,15 +200,36 @@
 
 @section scripts {
     <script>
-        $(document).ready(function () {
-            // Add fade-in animation to cards
-            $('.about-card').each(function (index) {
-                $(this).addClass('fade-in');
-                $(this).css('animation-delay', (index * 0.2) + 's');
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ About Pilates page loaded (Native JS)');
+
+            // Add fade-in animation to cards with native JavaScript
+            const aboutCards = document.querySelectorAll('.about-card');
+            aboutCards.forEach(function (card, index) {
+                card.classList.add('fade-in');
+                // Add animation delay
+                card.style.animationDelay = (index * 0.2) + 's';
             });
 
             // Trigger scroll to activate animations
-            $(window).trigger('scroll');
+            setTimeout(function () {
+                window.dispatchEvent(new Event('scroll'));
+            }, 100);
+
+            // Optional: Add intersection observer for better performance
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                aboutCards.forEach(function (card) {
+                    observer.observe(card);
+                });
+            }
         });
     </script>
 }

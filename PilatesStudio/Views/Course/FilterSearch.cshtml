@@ -117,22 +117,34 @@
 </section>
 
 @section scripts {
-    <!-- Ensure jQuery validation libraries are correctly loaded -->
-    <script src="~/Scripts/jquery.validate.min.js"></script>
-    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+ 
     <script src="~/Scripts/FilterSearch.js"></script>
 
-    <!-- Debug script -->
+    
     <script>
-        $(document).ready(function () {
-            console.log('✅ jQuery version:', $.fn.jquery);
-            console.log('✅ Search input:', $('#searchInput').length);
-            console.log('✅ Courses container:', $('#coursesContainer').length);
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ FilterSearch page loaded (Native JS)');
+            console.log('✅ Search input:', document.getElementById('searchInput'));
+            console.log('✅ Courses container:', document.getElementById('coursesContainer'));
 
-            // Test search functionality
-            $('#searchInput').on('input', function () {
-                console.log('Search input:', $(this).val());
+            // Test search functionality with native JS
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    console.log('Search input (Native):', this.value);
+                });
+            }
+
+          
+            const courseCards = document.querySelectorAll('.course-card');
+            courseCards.forEach(card => {
+                card.classList.add('fade-in');
             });
+
+         
+            setTimeout(function () {
+                window.dispatchEvent(new Event('scroll'));
+            }, 100);
         });
     </script>
-}
+}  
